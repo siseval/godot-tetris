@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://d3rt03dcl4stl"]
+
+[ext_resource type="Texture2D" uid="uid://c6afm6injn2o5" path="res://sprites/hud/hud1.png" id="1_re0x8"]
+
+[node name="Hud" type="CanvasGroup"]
+
+[node name="HudSprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_re0x8")
