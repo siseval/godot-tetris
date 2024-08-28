@@ -23,9 +23,9 @@ zoom = Vector2(2, 2)
 one_shot = true
 
 [node name="DebugUI" parent="." instance=ExtResource("5_j5hsd")]
-offset_left = -480.0
+offset_left = -479.0
 offset_top = -270.0
-offset_right = -1440.0
+offset_right = -1439.0
 offset_bottom = -810.0
 
 [connection signal="timeout" from="Clock" to="." method="onClockTimeout"]

@@ -81,12 +81,12 @@ public partial class Main : Node
 		bool did_input = false;
 		if (Input.IsActionJustPressed("left"))
 		{
-			moveX(false);
+			moveLeft();
 			did_input = true;	
 		}
 		if (Input.IsActionJustPressed("right"))
 		{
-			moveX(true);
+			moveRight();
 			did_input = true;
 		}
 		if (Input.IsActionJustPressed("down"))
@@ -123,42 +123,80 @@ public partial class Main : Node
 		}
 	}
 
-	private void moveX(bool right)
+	private void moveRight(int dx = 1, bool check_collision = true)
 	{
 		doUpdate();
-		if (right)
+		if (!_board.collidesRight(_current_piece._rotation, dx) || !check_collision)
 		{
-			if (!_board.collidesRight(_current_piece._rotation, 1))
-			{
-				_position.X += 1;	
-				incrementMoves();
-			}
+			_position.X += dx;	
+			incrementMoves();
 		}
-		else
+	}
+
+	private void moveLeft(int dx = 1, bool check_collision = true)
+	{
+		doUpdate();
+		if (!_board.collidesLeft(_current_piece._rotation, -dx) || !check_collision)
 		{
-			if (!_board.collidesLeft(_current_piece._rotation, 1))
-			{
-				_position.X -= 1;
-				incrementMoves();
-			}
+			_position.X -= dx;
+			incrementMoves();
 		}
 	}
 
 	private void rotateLeft()
 	{
+		doUpdate();
 		if (!_board.collidesLeft(_current_piece.getPreviousRotation()) &&
 		    !_board.collidesRight(_current_piece.getPreviousRotation()))
 		{
 			_current_piece.rotateLeft();
+			return;
 		}
-		//if (!_board.collidesLeft(_current_piece.getPreviousRotation()))
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (!_board.collidesLeft(_current_piece.getPreviousRotation(), i) &&
+			    !_board.collidesRight(_current_piece.getPreviousRotation(), i))
+			{
+				moveRight(i, false);
+				_current_piece.rotateLeft();
+				return;
+			}
+			if (!_board.collidesLeft(_current_piece.getPreviousRotation(), -i) &&
+			    !_board.collidesRight(_current_piece.getPreviousRotation(), -i))
+			{
+				moveLeft(i, false);
+				_current_piece.rotateLeft();
+				return;
+			}
+		}
 	}
 	private void rotateRight()
 	{
+		doUpdate();
 		if (!_board.collidesRight(_current_piece.getNextRotation()) &&
 		    !_board.collidesLeft(_current_piece.getNextRotation()))
 		{
 			_current_piece.rotateRight();
+			return;
+		}
+		
+		for (int i = 0; i < 3; i++)
+		{
+			if (!_board.collidesLeft(_current_piece.getNextRotation(), -i) &&
+			    !_board.collidesRight(_current_piece.getNextRotation(), -i))
+			{
+				moveLeft(i, false);
+				_current_piece.rotateLeft();
+				return;
+			}
+			if (!_board.collidesLeft(_current_piece.getNextRotation(), i) &&
+			    !_board.collidesRight(_current_piece.getNextRotation(), i))
+			{
+				moveRight(i, false);
+				_current_piece.rotateLeft();
+				return;
+			}
 		}
 	}
 

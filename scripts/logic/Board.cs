@@ -11,7 +11,7 @@ public partial class Board : TileMapLayer
 	private const int _HEIGHT = 20;
 	private const int _WIDTH = 10;
 	
-	private int[,] _grid = new int[_HEIGHT, _WIDTH];
+	private readonly int[,] _grid = new int[_HEIGHT, _WIDTH];
 	
 	private int _atlas_source_id;
 	public override void _Ready()
@@ -69,11 +69,11 @@ public partial class Board : TileMapLayer
 				_position.Y + _current_piece.CollisionCoordinates[rotation, i, 0],
 				_position.X + _current_piece.CollisionCoordinates[rotation, i, 1]
 			};
-			if (coordinates[0] < 0 || coordinates[0] > _HEIGHT - 1 || coordinates[1] - dx > _WIDTH - 1)
+			if (coordinates[0] < 0 || coordinates[0] > _HEIGHT - 1 || coordinates[1] + dx > _WIDTH - 1)
 			{
 				continue;
 			}
-			if (coordinates[1] - dx < 0 || _grid[coordinates[0], coordinates[1] - dx] != 0)
+			if (coordinates[1] + dx < 0 || _grid[coordinates[0], coordinates[1] + dx] != 0)
 			{
 				return true;
 			}

@@ -8,8 +8,8 @@ public class QueueHandler
 {
 	
 	private const int _QUEUE_LENGTH = 4;
-	private Piece[] _queue = new Piece[_QUEUE_LENGTH];
-	private List<PieceType> _bag = new();
+	private readonly Piece[] _queue = new Piece[_QUEUE_LENGTH];
+	private readonly List<PieceType> _bag = new();
 	
 	private readonly Random _random = new();
 
