@@ -1,19 +1,39 @@
-[gd_scene load_steps=5 format=3 uid="uid://d3rt03dcl4stl"]
+[gd_scene load_steps=6 format=3 uid="uid://d3rt03dcl4stl"]
 
 [ext_resource type="Script" path="res://scripts/hud/Hud.cs" id="1_k8xe3"]
 [ext_resource type="Texture2D" uid="uid://c6afm6injn2o5" path="res://sprites/hud/hud1.png" id="1_re0x8"]
 [ext_resource type="PackedScene" uid="uid://cpifh1suqv4hd" path="res://scenes/piece_display.tscn" id="3_yq2h0"]
 [ext_resource type="Texture2D" uid="uid://ccwpmxy12lu0q" path="res://sprites/hud/heldbox.png" id="4_p542u"]
+[ext_resource type="Texture2D" uid="uid://bybrsvtjq84ki" path="res://sprites/hud/queuebox.png" id="5_gw3ai"]
 
 [node name="Hud" type="CanvasGroup"]
 script = ExtResource("1_k8xe3")
 
+[node name="HeldDisplay" parent="." instance=ExtResource("3_yq2h0")]
+position = Vector2(-183, -153)
+
 [node name="HudSprite" type="Sprite2D" parent="."]
 texture = ExtResource("1_re0x8")
 
-[node name="HeldDisplay" parent="." instance=ExtResource("3_yq2h0")]
-position = Vector2(-208, -160)
-
 [node name="HeldBoxSprite" type="Sprite2D" parent="."]
-position = Vector2(-176, -128)
+position = Vector2(-151, -121)
 texture = ExtResource("4_p542u")
+
+[node name="QueueBoxSprite" type="Sprite2D" parent="."]
+position = Vector2(152, -24)
+texture = ExtResource("5_gw3ai")
+
+[node name="QueueDisplay1" parent="." instance=ExtResource("3_yq2h0")]
+position = Vector2(120, -152)
+
+[node name="QueueDisplay2" parent="." instance=ExtResource("3_yq2h0")]
+position = Vector2(120, -104)
+
+[node name="QueueDisplay3" parent="." instance=ExtResource("3_yq2h0")]
+position = Vector2(120, -56)
+
+[node name="QueueDisplay4" parent="." instance=ExtResource("3_yq2h0")]
+position = Vector2(120, -8)
+
+[node name="QueueDisplay5" parent="." instance=ExtResource("3_yq2h0")]
+position = Vector2(120, 40)

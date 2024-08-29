@@ -7,7 +7,7 @@ namespace Tetris.scripts.logic;
 public class QueueHandler
 {
 	
-	private const int _QUEUE_LENGTH = 4;
+	private const int _QUEUE_LENGTH = 5;
 	private readonly Piece[] _queue = new Piece[_QUEUE_LENGTH];
 	private readonly List<PieceType> _bag = new();
 	
@@ -21,6 +21,17 @@ public class QueueHandler
 		fillQueue();
 	}
 
+	public PieceType[] getQueueTypes()
+	{
+		var types = new PieceType[_queue.Length];
+
+		for (int i = 0; i < _queue.Length; i++)
+		{
+			types[i] = _queue[i].Type;
+		}
+		
+		return types;
+	}
 	public Piece pullFromQueue()
 	{
 		Piece piece = _queue[0];

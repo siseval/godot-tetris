@@ -265,6 +265,7 @@ public partial class Main : Node
 	private void setCurrentPieceFromQueue()
 	{
 		setCurrentPiece(_queue_handler.pullFromQueue());
+		_hud.updateQueueDisplay(_queue_handler.getQueueTypes(), _current_atlas_source_id);
 		_has_held = false;
 	}
 

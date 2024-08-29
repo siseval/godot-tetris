@@ -1,26 +1,27 @@
 using Godot;
 using Tetris.scripts.logic;
+using static Tetris.scripts.logic.Piece;
 
 namespace Tetris.scripts.hud;
 
 public partial class PieceDisplay : TileMapLayer
 {
-	private Piece.PieceType _type;
+	private PieceType _type;
 	private int _atlas_source_id;
 	
 	private Vector2 _start_position;
-	public void updateDisplay(Piece.PieceType type, int atlas_source_id)
+	public void updateDisplay(PieceType type, int atlas_source_id)
 	{
 		Clear();
 		
 		_type = type;
 		_atlas_source_id = atlas_source_id;
 		
-		if (type == Piece.PieceType.O)
+		if (type == PieceType.O)
 		{
 			Position = _start_position;
 		}
-		else if (type == Piece.PieceType.I)
+		else if (type == PieceType.I)
 		{
 			Position = _start_position + new Vector2(0, 8);
 		}
