@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3 uid="uid://cpifh1suqv4hd"]
+
+[ext_resource type="Texture2D" uid="uid://wjvgaym4bxfh" path="res://sprites/pieces/PiecesSheet.png" id="1_17tsx"]
+[ext_resource type="Script" path="res://scripts/hud/PieceDisplay.cs" id="2_8n425"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2yc48"]
+texture = ExtResource("1_17tsx")
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_v3vmw"]
+sources/0 = SubResource("TileSetAtlasSource_2yc48")
+
+[node name="PieceDisplay" type="TileMapLayer"]
+tile_set = SubResource("TileSet_v3vmw")
+script = ExtResource("2_8n425")

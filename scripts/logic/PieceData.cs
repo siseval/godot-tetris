@@ -43,6 +43,25 @@ public static class PieceData
               
         return collision_coordinates;
     }
+    
+    public static int[,] getCollisionCoordinates(int type, int rotation)
+    {
+        int collision_coordinate = 0;
+        int[,] collision_coordinates = new int[4, 2];
+
+        for (int i = 0; i < _MATRICES.GetLength(2); i++)
+        {
+            for (int j = 0; j < _MATRICES.GetLength(3); j++)
+            {
+                if (_MATRICES[type, rotation, i, j] == 0) continue;
+                collision_coordinates[collision_coordinate, 0] = i; 
+                collision_coordinates[collision_coordinate, 1] = j; 
+                collision_coordinate += 1;
+            }
+        }
+              
+        return collision_coordinates;
+    }
 
     private static readonly byte[,,,] _MATRICES = {
         // I PIECE:
@@ -240,31 +259,32 @@ public static class PieceData
 
         // T PIECE:
         {
+            
             // ROTATION 0:
             {
                 { 0, 0, 0, 0 },
-                { 1, 1, 1, 0 },
                 { 0, 1, 0, 0 },
+                { 1, 1, 1, 0 },
                 { 0, 0, 0, 0 }
             },
             // ROTATION 1:
             {
                 { 0, 1, 0, 0 },
-                { 1, 1, 0, 0 },
+                { 0, 1, 1, 0 },
                 { 0, 1, 0, 0 },
                 { 0, 0, 0, 0 }
             },
             // ROTATION 2:
             {
                 { 0, 0, 0, 0 },
-                { 0, 1, 0, 0 },
                 { 1, 1, 1, 0 },
+                { 0, 1, 0, 0 },
                 { 0, 0, 0, 0 }
             },
             // ROTATION 3:
             {
                 { 0, 1, 0, 0 },
-                { 0, 1, 1, 0 },
+                { 1, 1, 0, 0 },
                 { 0, 1, 0, 0 },
                 { 0, 0, 0, 0 }
             }

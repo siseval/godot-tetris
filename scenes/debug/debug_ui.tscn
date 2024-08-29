@@ -12,6 +12,7 @@ grow_vertical = 2
 script = ExtResource("1_gro06")
 
 [node name="LockTimeLabel" type="Label" parent="."]
+visible = false
 layout_mode = 0
 offset_left = 31.0
 offset_top = 23.0

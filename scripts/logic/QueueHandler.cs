@@ -11,6 +11,8 @@ public class QueueHandler
 	private readonly Piece[] _queue = new Piece[_QUEUE_LENGTH];
 	private readonly List<PieceType> _bag = new();
 	
+	private Piece _held_piece;
+	
 	private readonly Random _random = new();
 
 	public QueueHandler()
@@ -27,7 +29,7 @@ public class QueueHandler
 			_queue[i] = _queue[i + 1];
 		}
 		_queue[_QUEUE_LENGTH - 1] = null;
-		fillQueue();
+		fillLastInQueue();
 		return piece;
 	}
 
@@ -42,6 +44,13 @@ public class QueueHandler
 	private void fillLastInQueue()
 	{
 		_queue[^1] ??= new Piece(drawFromBag());
+	}
+
+	public Piece holdPiece(Piece piece)
+	{
+		Piece held_buffer = _held_piece;
+		_held_piece = piece;
+		return held_buffer;
 	}
 
 	private PieceType drawFromBag()

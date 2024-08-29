@@ -12,8 +12,8 @@ public partial class Board : TileMapLayer
 	private const int _WIDTH = 10;
 	
 	private readonly int[,] _grid = new int[_HEIGHT, _WIDTH];
-	
-	private int _atlas_source_id;
+
+	private int AtlasSourceId { get; set; }
 	public override void _Ready()
 	{
 	}
@@ -113,14 +113,14 @@ public partial class Board : TileMapLayer
 		{
 			for (int j = 0; j < _grid.GetLength(1); j++)
 			{
-				SetCell(new Vector2I(j, i), _atlas_source_id, new Vector2I(_grid[i, j], 0));
+				SetCell(new Vector2I(j, i), AtlasSourceId, new Vector2I(_grid[i, j], 0));
 			}
 		}
 		for (int i = 0; i < _current_piece.Matrix.GetLength(0); i++)
 		{
 			for (int j = 0; j < _current_piece.Matrix.GetLength(1); j++)
 			{
-				SetCell(new Vector2I(j + _position.X, i + _position.Y), _atlas_source_id, new Vector2I(_current_piece.Matrix[i, j] == 0 ? _grid[Mathf.Clamp(i + _position.Y, 0, _HEIGHT - 1), Mathf.Clamp(j + _position.X, 0, _WIDTH - 1)] : (int)_current_piece.Type + 1, 0));
+				SetCell(new Vector2I(j + _position.X, i + _position.Y), AtlasSourceId, new Vector2I(_current_piece.Matrix[i, j] == 0 ? _grid[Mathf.Clamp(i + _position.Y, 0, _HEIGHT - 1), Mathf.Clamp(j + _position.X, 0, _WIDTH - 1)] : (int)_current_piece.Type + 1, 0));
 			}
 		}
 	}

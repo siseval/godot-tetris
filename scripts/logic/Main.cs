@@ -1,4 +1,5 @@
 using Godot;
+using Tetris.scripts.hud;
 
 namespace Tetris.scripts.logic;
 
@@ -18,12 +19,19 @@ public partial class Main : Node
 	private bool _collides_next;
 
 	private Timer _lock_timer;
-	private int _moves_made = 0;
+	private int _moves_made;
 	private const float _DEFAULT_LOCK_MS = 500;
 	private const int _MAX_MOVES = 15;
 
+	private bool _has_held;
+
 	private readonly QueueHandler _queue_handler = new();
 	
+	private InputHandler _input_handler;	
+	
+	private Hud _hud;
+
+	private int _current_atlas_source_id;
 
 
 	public override void _Ready()
@@ -34,7 +42,7 @@ public partial class Main : Node
 		updateLockTimerMs(_DEFAULT_LOCK_MS);
 		
 		resetPosition();
-		getNewCurrentPiece();
+		setCurrentPieceFromQueue();
 		
 		_board.setCurrentPiece(_current_piece);
 		_board.update(_position);
@@ -66,49 +74,18 @@ public partial class Main : Node
 		_board = GetNode<Board>("Board");
 		_clock = GetNode<Timer>("Clock");
 		_lock_timer = GetNode<Timer>("LockTimer");
+		_input_handler = GetNode<InputHandler>("InputHandler");
+		_hud = GetNode<Hud>("Hud");
 	}
 
 	public override void _Process(double delta)
 	{
-		if (handleInput())
+		if (_input_handler.handleInput(delta))
 		{
 			_board.update(_position);
 		}
 	}
 
-	private bool handleInput()
-	{
-		bool did_input = false;
-		if (Input.IsActionJustPressed("left"))
-		{
-			moveLeft();
-			did_input = true;	
-		}
-		if (Input.IsActionJustPressed("right"))
-		{
-			moveRight();
-			did_input = true;
-		}
-		if (Input.IsActionJustPressed("down"))
-		{
-			if (!_collides_next)
-			{
-				fall();
-			}
-			did_input = true;
-		}
-		if (Input.IsActionJustPressed("rotate_left"))
-		{
-			rotateLeft();
-			did_input = true;
-		}
-		if (Input.IsActionJustPressed("rotate_right"))
-		{
-			rotateRight();
-			did_input = true;
-		}
-		return did_input;
-	}
 	private void fall()
 	{
 		doUpdate();
@@ -123,6 +100,10 @@ public partial class Main : Node
 		}
 	}
 
+	private void doMoveRight()
+	{
+		moveRight();
+	}
 	private void moveRight(int dx = 1, bool check_collision = true)
 	{
 		doUpdate();
@@ -133,7 +114,11 @@ public partial class Main : Node
 		}
 		tryStartLockTimer();
 	}
-
+	
+	private void doMoveLeft()
+	{
+		moveLeft();
+	}
 	private void moveLeft(int dx = 1, bool check_collision = true)
 	{
 		doUpdate();
@@ -227,6 +212,27 @@ public partial class Main : Node
 		}
 	}
 
+	private void holdPiece()
+	{
+		if (_has_held)
+		{
+			return;
+		}
+
+		_hud.updateHeldDisplay(_current_piece.Type, _current_atlas_source_id);
+		Piece piece = _queue_handler.holdPiece(_current_piece);
+		if (piece != null)
+		{
+			setCurrentPiece(piece);	
+		}
+		else
+		{
+			setCurrentPieceFromQueue();
+		}
+		
+		_has_held = true; 
+	}
+
 	private void startLockTimer()
 	{
 		_lock_timer.Stop();
@@ -252,16 +258,22 @@ public partial class Main : Node
 	private void lockPiece()
 	{
 		_board.placeCurrentPiece();
-		getNewCurrentPiece();
-		_board.setCurrentPiece(_current_piece);
-		resetPosition();
+		setCurrentPieceFromQueue();
 		_collides_next = false;
 	}
 
-	private void getNewCurrentPiece()
+	private void setCurrentPieceFromQueue()
 	{
-		_current_piece = _queue_handler.pullFromQueue();
+		setCurrentPiece(_queue_handler.pullFromQueue());
+		_has_held = false;
+	}
+
+	private void setCurrentPiece(Piece piece)
+	{
+		_current_piece = piece;
 		_lock_timer.Stop();
+		resetPosition();
+		_board.setCurrentPiece(_current_piece);
 	}
 	private void doGameTick()
 	{

@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://qulxxpeggeyc"]
+[gd_scene load_steps=7 format=3 uid="uid://qulxxpeggeyc"]
 
 [ext_resource type="Script" path="res://scripts/logic/Main.cs" id="1_dh0ke"]
 [ext_resource type="PackedScene" uid="uid://c58hxyxcdnme2" path="res://scenes/board.tscn" id="1_n5n7p"]
 [ext_resource type="PackedScene" uid="uid://d3rt03dcl4stl" path="res://scenes/hud.tscn" id="2_3xqnt"]
 [ext_resource type="PackedScene" uid="uid://bvtt6eqdxybvp" path="res://scenes/camera.tscn" id="3_bkxxc"]
 [ext_resource type="PackedScene" uid="uid://b05w6mhnxq68" path="res://scenes/debug/debug_ui.tscn" id="5_j5hsd"]
+[ext_resource type="PackedScene" uid="uid://bn12ldpiyki57" path="res://scenes/input_handler.tscn" id="6_7lp0f"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_dh0ke")
@@ -28,5 +29,13 @@ offset_top = -270.0
 offset_right = -1439.0
 offset_bottom = -810.0
 
+[node name="InputHandler" parent="." instance=ExtResource("6_7lp0f")]
+
 [connection signal="timeout" from="Clock" to="." method="onClockTimeout"]
 [connection signal="timeout" from="LockTimer" to="." method="onLockTimerTimeout"]
+[connection signal="Hold" from="InputHandler" to="." method="holdPiece"]
+[connection signal="MoveDown" from="InputHandler" to="." method="fall"]
+[connection signal="MoveLeft" from="InputHandler" to="." method="doMoveLeft"]
+[connection signal="MoveRight" from="InputHandler" to="." method="doMoveRight"]
+[connection signal="RotateLeft" from="InputHandler" to="." method="rotateLeft"]
+[connection signal="RotateRight" from="InputHandler" to="." method="rotateRight"]
