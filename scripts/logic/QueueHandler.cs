@@ -26,6 +26,7 @@ public class QueueHandler
 		{
 			_queue[i] = _queue[i + 1];
 		}
+		_queue[_QUEUE_LENGTH - 1] = null;
 		fillQueue();
 		return piece;
 	}
@@ -42,7 +43,6 @@ public class QueueHandler
 	{
 		_queue[^1] ??= new Piece(drawFromBag());
 	}
-
 
 	private PieceType drawFromBag()
 	{

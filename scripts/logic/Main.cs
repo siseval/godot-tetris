@@ -119,7 +119,7 @@ public partial class Main : Node
 		}
 		else
 		{
-			startLockTimer();
+			tryStartLockTimer();
 		}
 	}
 
@@ -131,6 +131,7 @@ public partial class Main : Node
 			_position.X += dx;	
 			incrementMoves();
 		}
+		tryStartLockTimer();
 	}
 
 	private void moveLeft(int dx = 1, bool check_collision = true)
@@ -141,6 +142,7 @@ public partial class Main : Node
 			_position.X -= dx;
 			incrementMoves();
 		}
+		tryStartLockTimer();
 	}
 
 	private void rotateLeft()
@@ -150,26 +152,30 @@ public partial class Main : Node
 		    !_board.collidesRight(_current_piece.getPreviousRotation()))
 		{
 			_current_piece.rotateLeft();
+			incrementMoves();
 			return;
 		}
 
 		for (int i = 0; i < 3; i++)
 		{
 			if (!_board.collidesLeft(_current_piece.getPreviousRotation(), i) &&
-			    !_board.collidesRight(_current_piece.getPreviousRotation(), i))
+				!_board.collidesRight(_current_piece.getPreviousRotation(), i))
 			{
-				moveRight(i, false);
+				moveRight(i);
 				_current_piece.rotateLeft();
+				incrementMoves();
 				return;
 			}
 			if (!_board.collidesLeft(_current_piece.getPreviousRotation(), -i) &&
-			    !_board.collidesRight(_current_piece.getPreviousRotation(), -i))
+				!_board.collidesRight(_current_piece.getPreviousRotation(), -i))
 			{
-				moveLeft(i, false);
+				moveLeft(i);
 				_current_piece.rotateLeft();
+				incrementMoves();
 				return;
 			}
 		}
+		tryStartLockTimer();
 	}
 	private void rotateRight()
 	{
@@ -178,26 +184,30 @@ public partial class Main : Node
 		    !_board.collidesLeft(_current_piece.getNextRotation()))
 		{
 			_current_piece.rotateRight();
+			incrementMoves();
 			return;
 		}
-		
+
 		for (int i = 0; i < 3; i++)
 		{
 			if (!_board.collidesLeft(_current_piece.getNextRotation(), -i) &&
-			    !_board.collidesRight(_current_piece.getNextRotation(), -i))
+				!_board.collidesRight(_current_piece.getNextRotation(), -i))
 			{
-				moveLeft(i, false);
-				_current_piece.rotateLeft();
+				moveLeft(i);	
+				_current_piece.rotateRight();
+				incrementMoves();
 				return;
 			}
 			if (!_board.collidesLeft(_current_piece.getNextRotation(), i) &&
-			    !_board.collidesRight(_current_piece.getNextRotation(), i))
+					 !_board.collidesRight(_current_piece.getNextRotation(), i))
 			{
-				moveRight(i, false);
-				_current_piece.rotateLeft();
+				moveRight(i);
+				_current_piece.rotateRight();
+				incrementMoves();
 				return;
 			}
 		}
+		tryStartLockTimer();
 	}
 
 	private void incrementMoves()
@@ -221,6 +231,14 @@ public partial class Main : Node
 	{
 		_lock_timer.Stop();
 		_lock_timer.Start();
+	}
+
+	private void tryStartLockTimer()
+	{
+		if (_collides_next && _lock_timer.TimeLeft == 0)
+		{
+			startLockTimer();
+		}
 	}
 
 	private void tryLockPiece()
