@@ -1,13 +1,17 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Tetris.scripts.logic;
 
 public class Piece
 {
-    public PieceType Type { get; set; }
-    public int[,] Matrix { get; set; } = new int[4, 4];
-    public int[,,] CollisionCoordinates { get; set; } = new int[4, 4, 2];
+    public PieceType Type { get; }
+    public int[,] Matrix { get; } = new int[4, 4];
+    public int[,,] CollisionCoordinates { get; }
     
     private readonly int[,,] _matrices;
     public int _rotation;
+    
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum PieceType
     {
         NULL = -1,
@@ -18,7 +22,7 @@ public class Piece
         L = 4,
         J = 5, 
         T = 6,
-        NUM_TYPES = 7,
+        NUM_TYPES = 7
     }
 
     public Piece(PieceType type)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 namespace Tetris.scripts.logic;
@@ -38,6 +39,7 @@ public partial class Board : TileMapLayer
 			}
 			_grid[coordinates[0], coordinates[1]] = (int)_current_piece.Type + 1;
 		}
+		checkLines();
 	}
 
 	public void update(Vector2I position)
@@ -107,6 +109,48 @@ public partial class Board : TileMapLayer
 		return false;
 	}
 
+	private void checkLines()
+	{
+		var heights = new List<int>();
+		for (int i = 0; i < _HEIGHT; i++)
+		{
+			bool broken = false;
+			for (int j = 0; j < _WIDTH; j++)
+			{
+				if (_grid[i, j] == 0)
+				{
+					broken = true;
+					break;
+				}
+			}
+			if (broken)
+			{
+				continue;
+			}
+			heights.Add(i);
+		}
+		clearLines(heights);
+	}
+
+	private void clearLines(List<int> heights)
+	{
+		foreach (int height in heights)
+		{
+			clearLine(height);	
+		}
+	}
+
+	private void clearLine(int height)
+	{
+		for (int i = height; i > 1; i--)
+		{
+			for (int j = 0; j < _WIDTH; j++)
+			{
+				_grid[i, j] = _grid[i - 1, j];	
+			}
+		}
+	}
+	
 	private void drawTiles()
 	{
 		for (int i = 0; i < _grid.GetLength(0); i++)
