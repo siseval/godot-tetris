@@ -29,6 +29,8 @@ public partial class InputHandler : Node
 	[Signal]
 	public delegate void RotateRightEventHandler();
 	[Signal]
+	public delegate void SlamEventHandler();
+	[Signal]
 	public delegate void HoldEventHandler();
 	private bool checkMoveInput(string action, double dt)
 	{
@@ -102,6 +104,11 @@ public partial class InputHandler : Node
 		if (Input.IsActionJustPressed("rotate_right"))
 		{
 			EmitSignal(SignalName.RotateRight);
+			did_input = true;
+		}
+		if (Input.IsActionJustPressed("slam"))
+		{
+			EmitSignal(SignalName.Slam);
 			did_input = true;
 		}
 

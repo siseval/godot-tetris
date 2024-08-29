@@ -39,3 +39,4 @@ offset_bottom = -810.0
 [connection signal="MoveRight" from="InputHandler" to="." method="doMoveRight"]
 [connection signal="RotateLeft" from="InputHandler" to="." method="rotateLeft"]
 [connection signal="RotateRight" from="InputHandler" to="." method="rotateRight"]
+[connection signal="Slam" from="InputHandler" to="." method="slam"]

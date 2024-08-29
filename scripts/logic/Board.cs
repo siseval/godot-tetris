@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -13,10 +14,16 @@ public partial class Board : TileMapLayer
 	private const int _WIDTH = 10;
 	
 	private readonly int[,] _grid = new int[_HEIGHT, _WIDTH];
-
+	private TileMapLayer _ghost;
 	private int AtlasSourceId { get; set; }
 	public override void _Ready()
 	{
+		getNodes();
+	}
+
+	private void getNodes()
+	{
+		_ghost = GetNode<TileMapLayer>("Ghost");	
 	}
 
 	public override void _Process(double delta)
@@ -46,15 +53,29 @@ public partial class Board : TileMapLayer
 	{
 		_position = position;
 		drawTiles();
+		drawGhost();
 	}
 
-	public bool collidesOnNext(int rotation)
+	public int getLowestHeight()
 	{
+		int height = 0;
+
+		while (!collidesOnNext(_current_piece._rotation, height))
+		{
+			height += 1;
+		}
+
+		return _position.Y + height;
+	}
+
+	public bool collidesOnNext(int rotation, int dy = 0)
+	{
+		dy = Math.Max(0, dy);
 		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(0); i++)
 		{
 			int[] coordinates =
 			{
-				_position.Y + _current_piece.CollisionCoordinates[rotation, i, 0],
+				_position.Y + _current_piece.CollisionCoordinates[rotation, i, 0] + dy,
 				_position.X + _current_piece.CollisionCoordinates[rotation, i, 1]
 			};
 			if (coordinates[0] + 1 >= _HEIGHT || _grid[coordinates[0] + 1, coordinates[1]] != 0)
@@ -160,12 +181,30 @@ public partial class Board : TileMapLayer
 				SetCell(new Vector2I(j, i), AtlasSourceId, new Vector2I(_grid[i, j], 0));
 			}
 		}
-		for (int i = 0; i < _current_piece.Matrix.GetLength(0); i++)
+		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(0); i++)
 		{
-			for (int j = 0; j < _current_piece.Matrix.GetLength(1); j++)
+			int[] coordinates =
 			{
-				SetCell(new Vector2I(j + _position.X, i + _position.Y), AtlasSourceId, new Vector2I(_current_piece.Matrix[i, j] == 0 ? _grid[Mathf.Clamp(i + _position.Y, 0, _HEIGHT - 1), Mathf.Clamp(j + _position.X, 0, _WIDTH - 1)] : (int)_current_piece.Type + 1, 0));
-			}
+				_position.Y + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 0],
+				_position.X + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 1]
+			};
+
+			SetCell(new Vector2I(coordinates[1], coordinates[0]), AtlasSourceId, new Vector2I((int)_current_piece.Type + 1, 0));
+		}
+	}
+
+	private void drawGhost()
+	{
+		_ghost.Clear();
+		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(0); i++)
+		{
+			int[] coordinates =
+			{
+				getLowestHeight() + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 0],
+				_position.X + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 1]
+			};
+
+			_ghost.SetCell(new Vector2I(coordinates[1], coordinates[0]), AtlasSourceId, new Vector2I((int)_current_piece.Type + 1, 0));
 		}
 	}
 }

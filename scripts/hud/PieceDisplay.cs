@@ -16,6 +16,8 @@ public partial class PieceDisplay : TileMapLayer
 		
 		_type = type;
 		_atlas_source_id = atlas_source_id;
+
+		int shift_down = 0;
 		
 		if (type == PieceType.O)
 		{
@@ -28,12 +30,13 @@ public partial class PieceDisplay : TileMapLayer
 		else
 		{
 			Position = _start_position + new Vector2(8, 0) * Scale;
+			shift_down = 1; 
 		}
 
 		int[,] coordinates = PieceData.getCollisionCoordinates((int)type, 0);
 		for (int i = 0; i < coordinates.GetLength(0); i++)
 		{
-			SetCell(new Vector2I(coordinates[i, 1], coordinates[i, 0]), atlas_source_id, new Vector2I((int)type + 1, 0));	
+			SetCell(new Vector2I(coordinates[i, 1], coordinates[i, 0] + shift_down), atlas_source_id, new Vector2I((int)type + 1, 0));	
 		}
 	}
 	

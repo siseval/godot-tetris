@@ -100,6 +100,15 @@ public partial class Main : Node
 		}
 	}
 
+	private void slam()
+	{
+		while (!_board.collidesOnNext(_current_piece._rotation))
+		{
+			fall();
+		}
+		lockPiece();
+	}
+
 	private void doMoveRight()
 	{
 		moveRight();
