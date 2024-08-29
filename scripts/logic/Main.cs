@@ -178,26 +178,30 @@ public partial class Main : Node
 		    !_board.collidesLeft(_current_piece.getNextRotation()))
 		{
 			_current_piece.rotateRight();
+			incrementMoves();
 			return;
 		}
-		
+
 		for (int i = 0; i < 3; i++)
 		{
 			if (!_board.collidesLeft(_current_piece.getNextRotation(), -i) &&
-			    !_board.collidesRight(_current_piece.getNextRotation(), -i))
+				!_board.collidesRight(_current_piece.getNextRotation(), -i))
 			{
-				moveLeft(i, false);
-				_current_piece.rotateLeft();
+				moveLeft(i);	
+				_current_piece.rotateRight();
+				incrementMoves();
 				return;
 			}
 			if (!_board.collidesLeft(_current_piece.getNextRotation(), i) &&
-			    !_board.collidesRight(_current_piece.getNextRotation(), i))
+					 !_board.collidesRight(_current_piece.getNextRotation(), i))
 			{
-				moveRight(i, false);
-				_current_piece.rotateLeft();
+				moveRight(i);
+				_current_piece.rotateRight();
+				incrementMoves();
 				return;
 			}
 		}
+		tryStartLockTimer();
 	}
 
 	private void incrementMoves()
@@ -221,6 +225,14 @@ public partial class Main : Node
 	{
 		_lock_timer.Stop();
 		_lock_timer.Start();
+	}
+
+	private void tryStartLockTimer()
+	{
+		if (_collides_next && _lock_timer.TimeLeft == 0)
+		{
+			startLockTimer();
+		}
 	}
 
 	private void tryLockPiece()

@@ -32,6 +32,10 @@ public partial class Board : TileMapLayer
 		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(0); i++)
 		{
 			int[] coordinates = { _position.Y + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 0], _position.X + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 1] };
+			if (coordinates[0] < 0)
+			{
+				continue;
+			}
 			_grid[coordinates[0], coordinates[1]] = (int)_current_piece.Type + 1;
 		}
 	}
