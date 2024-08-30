@@ -9,13 +9,18 @@ public partial class Board : TileMapLayer
 	private Piece _current_piece;
 	private Vector2I _position;
 
-
 	private const int _HEIGHT = 20;
 	private const int _WIDTH = 10;
 	
 	private readonly int[,] _grid = new int[_HEIGHT, _WIDTH];
 	private TileMapLayer _ghost;
 	private int AtlasSourceId { get; set; }
+	
+	[Signal]
+	public delegate void AddScoreEventHandler(int score, bool level_mult);
+	[Signal]
+	public delegate void AddLinesEventHandler(int lines);
+
 	public override void _Ready()
 	{
 		getNodes();
@@ -35,18 +40,24 @@ public partial class Board : TileMapLayer
 		_current_piece = piece;
 	}
 
-	public void placeCurrentPiece()
+	public bool placeCurrentPiece()
 	{
 		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(0); i++)
 		{
-			int[] coordinates = { _position.Y + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 0], _position.X + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 1] };
+			int[] coordinates =
+			{
+				_position.Y + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 0],
+				_position.X + _current_piece.CollisionCoordinates[_current_piece._rotation, i, 1]
+			};
 			if (coordinates[0] < 0)
 			{
 				continue;
 			}
 			_grid[coordinates[0], coordinates[1]] = (int)_current_piece.Type + 1;
 		}
-		checkLines();
+
+		EmitSignal(SignalName.AddScore, 1, false);	
+		return checkLines();
 	}
 
 	public void update(Vector2I position)
@@ -78,6 +89,10 @@ public partial class Board : TileMapLayer
 				_position.Y + _current_piece.CollisionCoordinates[rotation, i, 0] + dy,
 				_position.X + _current_piece.CollisionCoordinates[rotation, i, 1]
 			};
+			if (coordinates[1] < 0 || coordinates[1] >= _WIDTH)
+			{
+				continue;
+			}
 			if (coordinates[0] + 1 >= _HEIGHT || _grid[coordinates[0] + 1, coordinates[1]] != 0)
 			{
 				return true;
@@ -130,7 +145,7 @@ public partial class Board : TileMapLayer
 		return false;
 	}
 
-	private void checkLines()
+	private bool checkLines()
 	{
 		var heights = new List<int>();
 		for (int i = 0; i < _HEIGHT; i++)
@@ -150,7 +165,10 @@ public partial class Board : TileMapLayer
 			}
 			heights.Add(i);
 		}
+
+		if (heights.Count <= 0) return false;
 		clearLines(heights);
+		return true;
 	}
 
 	private void clearLines(List<int> heights)
@@ -159,6 +177,8 @@ public partial class Board : TileMapLayer
 		{
 			clearLine(height);	
 		}
+		EmitSignal(SignalName.AddLines, heights.Count);
+		EmitSignal(SignalName.AddScore, Main._LINE_CLEAR_SCORES[heights.Count - 1], true);
 	}
 
 	private void clearLine(int height)

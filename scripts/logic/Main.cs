@@ -30,6 +30,18 @@ public partial class Main : Node
 	private InputHandler _input_handler;	
 	
 	private Hud _hud;
+	
+	private int _score;
+	private int _level = 1;
+	private int _lines;
+	private double _time;
+
+	public static readonly int[] _LINE_CLEAR_SCORES = { 100, 300, 500, 800 };
+	private int _combo_count;
+	private const int _COMBO_SCORE = 50;
+
+	private const int _LINES_PER_LEVEL = 10;
+	private int _lines_this_level;
 
 	private int _current_atlas_source_id;
 
@@ -84,6 +96,8 @@ public partial class Main : Node
 		{
 			_board.update(_position);
 		}
+		_time += delta;
+		_hud.updateLabels(_score, _level, _lines, _time);
 	}
 
 	private void fall()
@@ -107,6 +121,7 @@ public partial class Main : Node
 			fall();
 		}
 		lockPiece();
+		addScore(1, false);
 	}
 
 	private void doMoveRight()
@@ -266,7 +281,15 @@ public partial class Main : Node
 	}
 	private void lockPiece()
 	{
-		_board.placeCurrentPiece();
+		if (_board.placeCurrentPiece())
+		{
+			_combo_count += 1;
+			_score += _COMBO_SCORE * _combo_count;
+		}
+		else
+		{
+			_combo_count = 0;
+		}
 		setCurrentPieceFromQueue();
 		_collides_next = false;
 	}
@@ -321,9 +344,29 @@ public partial class Main : Node
 		tryLockPiece();
 	}
 
-
 	public double getLockTime()
 	{
 		return _lock_timer.TimeLeft;
+	}
+
+	private void addScore(int score, bool level_mult)
+	{
+		_score += score * (level_mult ? _level : 1);
+	}
+	private void addLines(int lines)
+	{
+		_lines += lines;
+		_lines_this_level += lines;
+
+		if (_lines_this_level >= _LINES_PER_LEVEL)
+		{
+			levelUp();
+		}
+	}
+
+	private void levelUp(int levels = 1)
+	{
+		_level += levels;
+		_lines_this_level = 0;
 	}
 }

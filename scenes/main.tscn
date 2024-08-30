@@ -31,6 +31,8 @@ offset_bottom = -810.0
 
 [node name="InputHandler" parent="." instance=ExtResource("6_7lp0f")]
 
+[connection signal="AddLines" from="Board" to="." method="addLines"]
+[connection signal="AddScore" from="Board" to="." method="addScore"]
 [connection signal="timeout" from="Clock" to="." method="onClockTimeout"]
 [connection signal="timeout" from="LockTimer" to="." method="onLockTimerTimeout"]
 [connection signal="Hold" from="InputHandler" to="." method="holdPiece"]
