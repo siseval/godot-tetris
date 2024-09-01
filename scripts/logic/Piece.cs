@@ -7,6 +7,7 @@ public class Piece
     public PieceType Type { get; }
     public int[,] Matrix { get; } = new int[4, 4];
     public int[,,] CollisionCoordinates { get; }
+    public int[,,,] CollisionChecks { get; }
     
     private readonly int[,,] _matrices;
     public int _rotation;
@@ -31,20 +32,37 @@ public class Piece
 
        _matrices = PieceData.getRotations((int)type);
        CollisionCoordinates = PieceData.getCollisionCoordinates((int)type);
+       CollisionChecks = PieceData.getCollisionChecks((int)type);
        updateRotation();
+    }
+
+    public int[,] getCollisionChecks(int rotation, int direction)
+    {
+        int[,] collision_checks = new int[4, 2];
+        
+        for (int i = 0; i < 4; i++)
+        {
+            collision_checks[i, 0] = CollisionChecks[rotation, direction, i, 0];         
+            collision_checks[i, 1] = CollisionChecks[rotation, direction, i, 1];         
+        }
+        
+        return collision_checks;
+    }
+
+    public void setRotation(int rotation)
+    {
+        _rotation = rotation;
+        
+        updateRotation();
     }
 
     public void rotateLeft()
     {
-        _rotation = getPreviousRotation();
-
-        updateRotation();
+        setRotation(getPreviousRotation());
     }
     public void rotateRight()
     {
-        _rotation = getNextRotation(); 
-
-        updateRotation();
+        setRotation(getNextRotation());
     }
 
     public int getNextRotation()

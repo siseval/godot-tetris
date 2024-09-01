@@ -19,18 +19,18 @@ public partial class PieceDisplay : TileMapLayer
 
 		int shift_down = 0;
 		
-		if (type == PieceType.O)
+		switch (type)
 		{
-			Position = _start_position;
-		}
-		else if (type == PieceType.I)
-		{
-			Position = _start_position + new Vector2(0, 8);
-		}
-		else
-		{
-			Position = _start_position + new Vector2(8, 0) * Scale;
-			shift_down = 1; 
+			case PieceType.O:
+				Position = _start_position;
+				break;
+			case PieceType.I:
+				Position = _start_position + new Vector2(0, 8);
+				break;
+			default:
+				Position = _start_position + new Vector2(8, 0) * Scale;
+				shift_down = 1;
+				break;
 		}
 
 		int[,] coordinates = PieceData.getCollisionCoordinates((int)type, 0);

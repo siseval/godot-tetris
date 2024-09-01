@@ -18,11 +18,6 @@ position = Vector2(-80, -160)
 [node name="Camera" parent="." instance=ExtResource("3_bkxxc")]
 zoom = Vector2(2, 2)
 
-[node name="Clock" type="Timer" parent="."]
-
-[node name="LockTimer" type="Timer" parent="."]
-one_shot = true
-
 [node name="DebugUI" parent="." instance=ExtResource("5_j5hsd")]
 offset_left = -479.0
 offset_top = -270.0
@@ -33,8 +28,6 @@ offset_bottom = -810.0
 
 [connection signal="AddLines" from="Board" to="." method="addLines"]
 [connection signal="AddScore" from="Board" to="." method="addScore"]
-[connection signal="timeout" from="Clock" to="." method="onClockTimeout"]
-[connection signal="timeout" from="LockTimer" to="." method="onLockTimerTimeout"]
 [connection signal="Hold" from="InputHandler" to="." method="holdPiece"]
 [connection signal="MoveDown" from="InputHandler" to="." method="fall"]
 [connection signal="MoveLeft" from="InputHandler" to="." method="doMoveLeft"]

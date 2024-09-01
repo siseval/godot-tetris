@@ -60,18 +60,21 @@ public partial class Board : TileMapLayer
 		return checkLines();
 	}
 
-	public void update(Vector2I position)
+	public void updatePosition(Vector2I position)
 	{
 		_position = position;
+	}
+	public void updateScreen()
+	{
 		drawTiles();
 		drawGhost();
 	}
 
-	public int getLowestHeight()
+	private int getLowestHeight()
 	{
 		int height = 0;
 
-		while (!collidesOnNext(_current_piece._rotation, height))
+		while (!collides(_current_piece._rotation, height + 1))
 		{
 			height += 1;
 		}
@@ -79,7 +82,29 @@ public partial class Board : TileMapLayer
 		return _position.Y + height;
 	}
 
-	public bool collidesOnNext(int rotation, int dy = 0)
+	public bool collides(int rotation, int dy = 0, int dx = 0)
+	{
+		dy = Math.Max(0, dy);
+		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(0); i++)
+		{
+			int[] coordinates =
+			{
+				_position.Y + _current_piece.CollisionCoordinates[rotation, i, 0] + dy,
+				_position.X + _current_piece.CollisionCoordinates[rotation, i, 1] + dx
+			};
+			if (coordinates[0] < 0 || coordinates[1] < 0 || coordinates[0] >= _HEIGHT || coordinates[1] >= _WIDTH)
+			{
+				return true;
+			}
+			if (_grid[coordinates[0], coordinates[1]] != 0)
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	public bool collidesDown(int rotation, int dy = 1)
 	{
 		dy = Math.Max(0, dy);
 		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(0); i++)
@@ -89,11 +114,11 @@ public partial class Board : TileMapLayer
 				_position.Y + _current_piece.CollisionCoordinates[rotation, i, 0] + dy,
 				_position.X + _current_piece.CollisionCoordinates[rotation, i, 1]
 			};
-			if (coordinates[1] < 0 || coordinates[1] >= _WIDTH)
+			if (coordinates[0] < 0 || coordinates[1] < 0 || coordinates[1] >= _WIDTH)
 			{
 				continue;
 			}
-			if (coordinates[0] + 1 >= _HEIGHT || _grid[coordinates[0] + 1, coordinates[1]] != 0)
+			if (coordinates[0] >= _HEIGHT || _grid[coordinates[0], coordinates[1]] != 0)
 			{
 				return true;
 			}
