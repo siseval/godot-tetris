@@ -70,7 +70,7 @@ public partial class Board : TileMapLayer
 		drawGhost();
 	}
 
-	private int getLowestHeight()
+	public int getLowestHeight()
 	{
 		int height = 0;
 
@@ -84,7 +84,6 @@ public partial class Board : TileMapLayer
 
 	public bool collides(int rotation, int dy = 0, int dx = 0)
 	{
-		dy = Math.Max(0, dy);
 		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(0); i++)
 		{
 			int[] coordinates =

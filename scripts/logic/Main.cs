@@ -18,8 +18,6 @@ public partial class Main : Node
 	private double _clock_ms;
 	private bool _clock_running;
 
-	private bool _collides_next;
-
 	private double _lock_timer;
 	private double _lock_ms;
 	private bool _lock_running;
@@ -57,7 +55,7 @@ public partial class Main : Node
 	{
 		getNodes();
 		
-		levelUp(19);
+		levelUp(20);
 		updateLockTimerMs(_CLOCK_TIMES[0]);
 		setCurrentPieceFromQueue();
 		
@@ -92,16 +90,15 @@ public partial class Main : Node
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (_input_handler.handleInput(delta))
-		{
-			_board.updatePosition(_position);
-			_board.updateScreen();
-		}
+		_input_handler.handleInput(delta);
+
 		_time += delta;
 		_hud.updateLabels(_score, _level, _lines, _time);
 
 		handleClockTimer(delta);
 		handleLockTimer(delta);
+		
+		updatePosition();
 	}
 
 	private void handleClockTimer(double delta)
@@ -140,32 +137,28 @@ public partial class Main : Node
 
 	private void fallToBottom()
 	{
-		while (!_board.collides(_current_piece._rotation, 1))
-		{
-			move(1);	
-		}
+		move(_board.getLowestHeight() - _position.Y);
 	}
 
 	private void slam()
 	{
-		while (!_board.collides(_current_piece._rotation, 1))
-		{
-			fall();
-		}
+		fallToBottom();
 		lockPiece();
 		addScore(1, false);
 	}
 
 	private void move(int dy = 0, int dx = 0, bool check_collision = true)
 	{
-		doUpdate();
+		updatePosition();
 		if (!check_collision || !_board.collides(_current_piece._rotation, dy, dx))
 		{
-			_position.X += dx;	
 			_position.Y += dy;
-			_board.updatePosition(_position);
+			_position.X += dx;	
 			incrementMoves();
 		}
+		updatePosition(); 
+		updateScreen();
+		
 		tryStartLockTimer();
 	}
 	
@@ -179,21 +172,23 @@ public partial class Main : Node
 	}
 	private void rotateLeft()
 	{
-		doUpdate();
+		updatePosition();
 		if (!_board.collides(_current_piece.getPreviousRotation()))
 		{
 			_current_piece.rotateLeft();
 			incrementMoves();
+			updateScreen();
 			return;
 		}
 		
 		int[,] coordinates = _current_piece.getCollisionChecks(_current_piece._rotation, 0);
 		for (int i = 0; i < 4; i++) 
 		{
-			if (_board.collides(_current_piece.getPreviousRotation(), coordinates[i, 0] - 1, coordinates[i, 1])) continue;
+			if (_board.collides(_current_piece.getPreviousRotation(), coordinates[i, 0], coordinates[i, 1])) continue;
 			move(coordinates[i, 0], coordinates[i, 1], false);
 			_current_piece.rotateLeft();
 			incrementMoves();
+			updateScreen();
 			return;
 		}
 
@@ -203,27 +198,30 @@ public partial class Main : Node
 			move(i, 0, false);
 			_current_piece.rotateLeft();
 			incrementMoves();
+			updateScreen();
 			return;
 		}
 		tryStartLockTimer();
 	}
 	private void rotateRight()
 	{
-		doUpdate();
+		updatePosition();
 		if (!_board.collides(_current_piece.getNextRotation()))
 		{
 			_current_piece.rotateRight();
 			incrementMoves();
+			updateScreen();
 			return;
 		}
 
 		int[,] coordinates = _current_piece.getCollisionChecks(_current_piece._rotation, 1);
 		for (int i = 0; i < 4; i++)
 		{
-			if (_board.collides(_current_piece.getNextRotation(), coordinates[i, 0] - 1, coordinates[i, 1])) continue;
+			if (_board.collides(_current_piece.getNextRotation(), coordinates[i, 0], coordinates[i, 1])) continue;
 			move(coordinates[i, 0], coordinates[i, 1], false);	
 			_current_piece.rotateRight();
 			incrementMoves();
+			updateScreen();
 			return;
 		}
 		for (int i = 0; i < 2; i++)
@@ -232,6 +230,7 @@ public partial class Main : Node
 			move(i, 0, false);
 			_current_piece.rotateRight();
 			incrementMoves();
+			updateScreen();
 			return;
 		}
 		tryStartLockTimer();
@@ -243,7 +242,7 @@ public partial class Main : Node
 		{
 			_moves_made += 1;
 		}
-		if (!_collides_next)
+		if (!_board.collides(_current_piece._rotation, 1))
 		{
 			return;
 		}
@@ -291,7 +290,7 @@ public partial class Main : Node
 
 	private void tryStartLockTimer()
 	{
-		if (_collides_next && !_lock_running)
+		if (_board.collides(_current_piece._rotation, 1) && !_lock_running)
 		{
 			startLockTimer();
 		}
@@ -299,8 +298,7 @@ public partial class Main : Node
 
 	private void tryLockPiece()
 	{
-		updateCollidesNext();
-		if (_collides_next)
+		if (_board.collides(_current_piece._rotation, 1))
 		{
 			lockPiece();
 		}
@@ -318,7 +316,6 @@ public partial class Main : Node
 			_combo_count = 0;
 		}
 		setCurrentPieceFromQueue();
-		_collides_next = false;
 	}
 
 	private void setCurrentPieceFromQueue()
@@ -333,13 +330,15 @@ public partial class Main : Node
 		_current_piece = piece;
 		stopLockTimer();
 		resetPosition();
-		_board.updatePosition(_position);
+		updatePosition();
 		_board.setCurrentPiece(_current_piece);
 		_current_piece.setRotation(0);
+		_clock_timer = 0;
+		_lock_timer = 0;
 	}
 	private void doGameTick()
 	{
-		if (_collides_next)
+		if (_board.collides(_current_piece._rotation, 1))
 		{
 			return;
 		}
@@ -352,17 +351,13 @@ public partial class Main : Node
 		fallToBottom();	
 	}
 
-	private void doUpdate()
+	private void updatePosition()
 	{
 		_board.updatePosition(_position);
-		_board.updateScreen();
-		updateCollidesNext();
 	}
-
-	private bool updateCollidesNext()
+	private void updateScreen()
 	{
-		_collides_next = _board.collides(_current_piece._rotation, 1);
-		return _collides_next;
+		_board.updateScreen();
 	}
 
 	private void resetPosition()
