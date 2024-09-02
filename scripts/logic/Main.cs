@@ -14,14 +14,12 @@ public partial class Main : Node
 	private const int _START_X = 3;
 	private const int _START_Y = 0;
 
-	private const double _DEFAULT_CLOCK_MS = 500;
 	private double _clock_timer;
 	private double _clock_ms;
 	private bool _clock_running;
 
 	private bool _collides_next;
 
-	private const double _DEFAULT_LOCK_MS = 500;
 	private double _lock_timer;
 	private double _lock_ms;
 	private bool _lock_running;
@@ -38,7 +36,7 @@ public partial class Main : Node
 	private Hud _hud;
 	
 	private int _score;
-	private int _level = 1;
+	private int _level;
 	private int _lines;
 	private double _time;
 
@@ -49,16 +47,18 @@ public partial class Main : Node
 	private const int _LINES_PER_LEVEL = 10;
 	private int _lines_this_level;
 
+	private static readonly double[] _CLOCK_TIMES =
+		{ 480, 410, 365, 325, 285, 250, 215, 190, 175, 145, 125, 105, 90, 75, 60, 45, 35, 25, 12, 0 };
+
 	private int _current_atlas_source_id;
 
 
 	public override void _Ready()
 	{
 		getNodes();
-		setupClock();	
 		
-		updateLockTimerMs(_DEFAULT_LOCK_MS);
-		
+		levelUp(19);
+		updateLockTimerMs(_CLOCK_TIMES[0]);
 		setCurrentPieceFromQueue();
 		
 		_board.updateScreen();
@@ -70,19 +70,17 @@ public partial class Main : Node
 	{
 		_clock_running = true;
 	}
-	private void setupClock()
-	{
-		updateClockMs(_DEFAULT_CLOCK_MS);	
-	}
 
 	private void updateClockMs(double clock_ms)
 	{
 		_clock_ms = clock_ms;
+		_clock_timer = 0;
 	}
 
 	private void updateLockTimerMs(double lock_ms)
 	{
 		_lock_ms = lock_ms;
+		_lock_timer = 0;
 	}
 
 	private void getNodes()
@@ -140,6 +138,14 @@ public partial class Main : Node
 		move(1);
 	}
 
+	private void fallToBottom()
+	{
+		while (!_board.collides(_current_piece._rotation, 1))
+		{
+			move(1);	
+		}
+	}
+
 	private void slam()
 	{
 		while (!_board.collides(_current_piece._rotation, 1))
@@ -182,9 +188,9 @@ public partial class Main : Node
 		}
 		
 		int[,] coordinates = _current_piece.getCollisionChecks(_current_piece._rotation, 0);
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) 
 		{
-			if (_board.collides(_current_piece.getPreviousRotation(), coordinates[i, 0], coordinates[i, 1])) continue;
+			if (_board.collides(_current_piece.getPreviousRotation(), coordinates[i, 0] - 1, coordinates[i, 1])) continue;
 			move(coordinates[i, 0], coordinates[i, 1], false);
 			_current_piece.rotateLeft();
 			incrementMoves();
@@ -214,7 +220,7 @@ public partial class Main : Node
 		int[,] coordinates = _current_piece.getCollisionChecks(_current_piece._rotation, 1);
 		for (int i = 0; i < 4; i++)
 		{
-			if (_board.collides(_current_piece.getNextRotation(), coordinates[i, 0], coordinates[i, 1])) continue;
+			if (_board.collides(_current_piece.getNextRotation(), coordinates[i, 0] - 1, coordinates[i, 1])) continue;
 			move(coordinates[i, 0], coordinates[i, 1], false);	
 			_current_piece.rotateRight();
 			incrementMoves();
@@ -337,7 +343,13 @@ public partial class Main : Node
 		{
 			return;
 		}
-		fall();
+
+		if (_clock_ms > 0)
+		{
+			fall();
+			return;
+		}
+		fallToBottom();	
 	}
 
 	private void doUpdate()
@@ -368,7 +380,7 @@ public partial class Main : Node
 		_lines += lines;
 		_lines_this_level += lines;
 
-		if (_lines_this_level >= _LINES_PER_LEVEL)
+		if (_lines_this_level >= _LINES_PER_LEVEL * _level)
 		{
 			levelUp();
 		}
@@ -378,5 +390,13 @@ public partial class Main : Node
 	{
 		_level += levels;
 		_lines_this_level = 0;
+		if (_level <= 20)
+		{
+			updateClockMs(_CLOCK_TIMES[_level - 1]);
+		}
+		else
+		{
+			updateLockTimerMs(_CLOCK_TIMES[_level - 1]);	
+		}
 	}
 }

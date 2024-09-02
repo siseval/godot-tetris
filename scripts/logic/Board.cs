@@ -104,72 +104,6 @@ public partial class Board : TileMapLayer
 		
 		return false;
 	}
-	public bool collidesDown(int rotation, int dy = 1)
-	{
-		dy = Math.Max(0, dy);
-		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(0); i++)
-		{
-			int[] coordinates =
-			{
-				_position.Y + _current_piece.CollisionCoordinates[rotation, i, 0] + dy,
-				_position.X + _current_piece.CollisionCoordinates[rotation, i, 1]
-			};
-			if (coordinates[0] < 0 || coordinates[1] < 0 || coordinates[1] >= _WIDTH)
-			{
-				continue;
-			}
-			if (coordinates[0] >= _HEIGHT || _grid[coordinates[0], coordinates[1]] != 0)
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
-	public bool collidesLeft(int rotation, int dx = 0)
-	{
-		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(1); i++)
-		{
-			int[] coordinates =
-			{
-				_position.Y + _current_piece.CollisionCoordinates[rotation, i, 0],
-				_position.X + _current_piece.CollisionCoordinates[rotation, i, 1]
-			};
-			if (coordinates[0] < 0 || coordinates[0] > _HEIGHT - 1 || coordinates[1] + dx > _WIDTH - 1)
-			{
-				continue;
-			}
-			if (coordinates[1] + dx < 0 || _grid[coordinates[0], coordinates[1] + dx] != 0)
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-	public bool collidesRight(int rotation, int dx = 0)
-	{
-		for (int i = 0; i < _current_piece.CollisionCoordinates.GetLength(1); i++)
-		{
-			int[] coordinates =
-			{
-				_position.Y + _current_piece.CollisionCoordinates[rotation, i, 0],
-				_position.X + _current_piece.CollisionCoordinates[rotation, i, 1]
-			};
-			if (coordinates[0] < 0 || coordinates[0] > _HEIGHT - 1 || coordinates[1] + dx < 0)
-			{
-				continue;
-			}
-			if (coordinates[1] + dx > _WIDTH - 1 || _grid[coordinates[0], coordinates[1] + dx] != 0)
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	private bool checkLines()
 	{
 		var heights = new List<int>();
@@ -178,11 +112,9 @@ public partial class Board : TileMapLayer
 			bool broken = false;
 			for (int j = 0; j < _WIDTH; j++)
 			{
-				if (_grid[i, j] == 0)
-				{
-					broken = true;
-					break;
-				}
+				if (_grid[i, j] != 0) continue;
+				broken = true;
+				break;
 			}
 			if (broken)
 			{
